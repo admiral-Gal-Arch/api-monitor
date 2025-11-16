@@ -1,3 +1,4 @@
+import os  # <-- ADDED THIS
 import streamlit as st
 import requests
 import pandas as pd
@@ -12,7 +13,17 @@ st.set_page_config(
 
 # --- UptimeRobot API Settings ---
 API_URL = "https://api.uptimerobot.com/v2/getMonitors"
-API_KEY = st.secrets.get("UPTIMEROBOT_API_KEY", "")
+
+# --- UPDATED SECTION ---
+# This now reads from Render's Environment Variables
+API_KEY = os.environ.get("UPTIMEROBOT_API_KEY", "")
+
+# Check if the key was loaded successfully
+if not API_KEY:
+    st.error("API Key not found. Please check your UPTIMEROBOT_API_KEY environment variable in Render.")
+    st.stop()
+# --- END UPDATED SECTION ---
+
 
 # --- Helper Dictionaries & Functions ---
 
@@ -30,10 +41,6 @@ def fetch_uptimerobot_data(api_key):
     """
     Fetches monitor data from the UptimeRobot API.
     """
-    if not api_key:
-        st.error("UptimeRobot API key not found. Please add it to st.secrets.")
-        return None
-
     payload = {
         "api_key": api_key,
         "format": "json",
